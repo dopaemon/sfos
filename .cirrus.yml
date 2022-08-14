@@ -35,6 +35,7 @@ task:
     - source ~/.bashrc
     - echo 'PS1="PlatformSDK $PS1"' > ~/.mersdk.profile
     - echo '[ -d /etc/bash_completion.d ] && for i in /etc/bash_completion.d/*;do . $i;done' >> ~/.mersdk.profile
+    - alias sfossdk=$PLATFORM_SDK_ROOT/sdks/sfossdk/sdk-chroot
     - sfossdk
 
     - sudo zypper ref
