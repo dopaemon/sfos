@@ -1,0 +1,38 @@
+env:
+    CIRRUS_CLONE_DEPTH: 1
+    BUILD_HOSTNAME: "CirrusCI"
+    CIRRUS_WORKING_DIR: "/home/doraemon"
+    ALLOW_MISSING_DEPENDENCIES: "true"
+
+task:
+  name: SailfishOS - Xiaomi Redmi Note 10 Pro
+  container:
+    image: dopaemon/bionic
+    cpu: 6
+    memory: 18G
+
+  setup_script:
+    - cd ~/
+    - echo 'export ANDROID_ROOT="$HOME/hadk"' >> .hadk.env
+    - echo 'export VENDOR="xiaomi"' >> .hadk.env
+    - echo 'export DEVICE="sweet"' >> .hadk.env
+    - echo 'export PORT_ARCH="aarch64"' >> .hadk.env
+
+    - echo 'function hadk() { source $HOME/.hadk.env; echo "Env setup for $DEVICE"; }' >> .mersdkubu.profile
+    - echo 'export PS1="HABUILD_SDK [\${DEVICE}] $PS1"' >> .mersdkubu.profile
+    - echo 'hadk' >> .mersdkubu.profile
+
+    - echo 'function hadk() { source $HOME/.hadk.env; echo "Env setup for $DEVICE"; }' >> .mersdk.profile
+    - echo 'hadk' >> .mersdk.profile
+  sdk_script:
+    - cd ~/
+    - sfossdk
+    - sudo zypper ref
+    - sudo zypper in android-tools-hadk kmod createrepo_c -y
+    - TARBALL=ubuntu-focal-20210531-android-rootfs.tar.bz2
+    - curl -O https://releases.sailfishos.org/ubu/$TARBALL
+    - UBUNTU_CHROOT=$PLATFORM_SDK_ROOT/sdks/ubuntu
+    - sudo mkdir -p $UBUNTU_CHROOT
+    - sudo tar --numeric-owner -xjf $TARBALL -C $UBUNTU_CHROOT
+    - sudo chroot $UBUNTU_CHROOT /bin/bash -c "chage -M 999999 $(id -nu 1000)"
+    - ubu-chroot -r $PLATFORM_SDK_ROOT/sdks/ubuntu -y
